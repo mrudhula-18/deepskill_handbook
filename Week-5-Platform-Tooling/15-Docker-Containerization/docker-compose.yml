@@ -1,0 +1,63 @@
+# docker-compose.yml - local multi-container stack for Module 15
+#
+# Brings up: a Postgres database, the Spring Boot backend, and the React
+# frontend (served via nginx), wired together on a shared Docker network.
+#
+# IMPORTANT: the "build.context" paths below are placeholders. Point them
+# at the actual backend/frontend module folders you want to containerize,
+# e.g. the Week-7 capstone's backend/ and frontend/ folders, or the
+# Week-3 Module-9 / Week-4 Module-11 apps used elsewhere in this repo.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dn5-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dn5_capstone
+      POSTGRES_USER: dn5_user
+      POSTGRES_PASSWORD: dn5_password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dn5_user -d dn5_capstone"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      # Adjust to the real backend module path, e.g.:
+      #   context: ../../Week-7-Capstone/backend
+      context: ../../Week-7-Capstone/backend
+      dockerfile: ../../../Week-5-Platform-Tooling/15-Docker-Containerization/backend.Dockerfile
+    container_name: dn5-backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dn5_capstone
+      SPRING_DATASOURCE_USERNAME: dn5_user
+      SPRING_DATASOURCE_PASSWORD: dn5_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      # Adjust to the real frontend module path, e.g.:
+      #   context: ../../Week-4-Frontend-Frameworks/11-React-App
+      context: ../../Week-4-Frontend-Frameworks/11-React-App
+      dockerfile: ../../../Week-5-Platform-Tooling/15-Docker-Containerization/frontend.Dockerfile
+    container_name: dn5-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  db-data:
+    driver: local

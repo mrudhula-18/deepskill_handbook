@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  DN5.0 Week 6 - Hello Lambda. A single Java 17 Lambda function exposed
+  through API Gateway on GET /hello, returning a JSON greeting.
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+
+Resources:
+  HelloFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: dn5-week6-hello-lambda
+      Runtime: java17
+      Handler: com.dn5.week6.cloud.HelloLambdaHandler::handleRequest
+      CodeUri: lambda/target/lambda-0.0.1.jar
+      Description: Returns {"message":"Hello, <name>!"} for GET /hello?name=<name>
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: GET
+
+Outputs:
+  HelloApiUrl:
+    Description: Invoke URL for the /hello endpoint
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
+  HelloFunctionArn:
+    Description: ARN of the Hello Lambda function
+    Value: !GetAtt HelloFunction.Arn

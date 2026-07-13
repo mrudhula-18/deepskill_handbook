@@ -1,0 +1,81 @@
+# ---------------------------------------------------------------------------
+# sample.gitignore - reference .gitignore for mixed Java + Node.js projects
+#
+# This is an EXAMPLE file for Module 13 training purposes. It is not active
+# on this repository (see the .gitignore at the repository root for that).
+# Copy the relevant sections into a real project's .gitignore as needed.
+# ---------------------------------------------------------------------------
+
+########################
+# Java / Maven / Gradle
+########################
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+.mvn/wrapper/maven-wrapper.jar
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+########################
+# IDE / Editors
+########################
+.idea/
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+########################
+# Node.js / npm / yarn / React
+########################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+dist/
+build/
+coverage/
+.eslintcache
+.env
+.env.local
+.env.*.local
+
+########################
+# Logs
+########################
+*.log
+logs/
+
+########################
+# OS-specific
+########################
+.DS_Store
+ehthumbs.db
+Desktop.ini
+
+########################
+# Docker
+########################
+*.pid
+
+########################
+# Secrets / local config (never commit real secrets)
+########################
+*.env
+*.pem
+*.key
+application-local.properties
+application-local.yml

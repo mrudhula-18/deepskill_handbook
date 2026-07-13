@@ -1,0 +1,90 @@
+# ci.yml - GitHub Actions CI workflow for Module 14 (DevOps / CI-CD)
+#
+# Triggers on pushes and pull requests targeting `main`.
+#
+# IMPORTANT: the `mvn -f <path>` paths below are EXAMPLES only. Adjust them
+# to point at whichever module(s) you actually want built/tested in your
+# fork of this repository. Paths are given relative to this workflow's
+# checkout root (the repository root), NOT relative to this file's folder.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Job 1: build/test the Java (Maven) modules
+  # ---------------------------------------------------------------------
+  java-build-and-test:
+    name: Java Build & Test (JDK 17)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: "maven"
+
+      # --------------------------------------------------------------
+      # Representative module #1: TDD / JUnit5 / Mockito (Week 2)
+      # Adjust this path to whichever module you want CI to cover.
+      # --------------------------------------------------------------
+      - name: Test Week-2 Module-04 (TDD-JUnit5-Mockito)
+        run: mvn -f ../../Week-2-Languages-and-Spring-Core/04-TDD-JUnit5-Mockito -B test
+
+      # --------------------------------------------------------------
+      # Representative module #2: Spring REST / Spring Boot 3 (Week 3)
+      # Adjust this path to whichever module you want CI to cover.
+      # --------------------------------------------------------------
+      - name: Test Week-3 Module-09 (Spring-REST-SpringBoot3)
+        run: mvn -f ../../Week-3-Data-and-REST/09-Spring-REST-SpringBoot3 -B test
+
+      # --------------------------------------------------------------
+      # To cover additional modules, add more steps following the same
+      # pattern, e.g.:
+      #
+      # - name: Test Week-7 Capstone Backend
+      #   run: mvn -f ../../Week-7-Capstone/backend -B test
+      # --------------------------------------------------------------
+
+  # ---------------------------------------------------------------------
+  # Job 2: build the React frontend (Node.js)
+  # ---------------------------------------------------------------------
+  frontend-build:
+    name: Frontend Build (Node 18)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          # Adjust cache-dependency-path if your package-lock.json lives
+          # under a nested module folder rather than the repo root.
+          cache-dependency-path: |
+            ../../Week-4-Frontend-Frameworks/11-React-App/package-lock.json
+
+      # --------------------------------------------------------------
+      # Adjust this path to point at the actual React app module you
+      # want built, e.g. the Week-4 Module-11 React app.
+      # --------------------------------------------------------------
+      - name: Install dependencies
+        working-directory: ../../Week-4-Frontend-Frameworks/11-React-App
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ../../Week-4-Frontend-Frameworks/11-React-App
+        run: npm run build

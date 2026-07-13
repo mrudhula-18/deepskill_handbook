@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  DN5.0 Week 6 - Provisions an S3 bucket (versioning enabled) and a
+  DynamoDB table (partition key "id", on-demand billing) for the
+  Online Bookstore demo.
+
+Parameters:
+  BucketNamePrefix:
+    Type: String
+    Default: dn5-week6-bookstore-assets
+    Description: Prefix used to build a globally-unique S3 bucket name.
+  TableName:
+    Type: String
+    Default: dn5-week6-bookstore-table
+    Description: Name of the DynamoDB table.
+
+Resources:
+  BookstoreAssetsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${BucketNamePrefix}-${AWS::AccountId}-${AWS::Region}"
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  BookstoreTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+Outputs:
+  BucketName:
+    Description: Name of the created S3 bucket
+    Value: !Ref BookstoreAssetsBucket
+  TableName:
+    Description: Name of the created DynamoDB table
+    Value: !Ref BookstoreTable
+  TableArn:
+    Description: ARN of the created DynamoDB table
+    Value: !GetAtt BookstoreTable.Arn

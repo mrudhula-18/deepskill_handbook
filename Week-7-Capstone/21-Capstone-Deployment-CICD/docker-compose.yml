@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ../19-Capstone-Bookstore-Backend
+      dockerfile: Dockerfile
+    image: bookstore-backend:local
+    container_name: bookstore-backend
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/v1/books"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ../20-Capstone-Bookstore-Frontend-React/bookstore-frontend
+      dockerfile: Dockerfile
+      args:
+        # Baked into the Vite build at image-build time. In this compose setup the
+        # frontend calls the backend at localhost:8080 from the browser (the
+        # container-to-container hostname "backend" is only reachable server-side).
+        VITE_API_BASE_URL: http://localhost:8080/api/v1
+    image: bookstore-frontend:local
+    container_name: bookstore-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: spring-rest-springboot3
+
+  datasource:
+    url: jdbc:h2:mem:restdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8080
+
+jwt:
+  # Demo-only secret. In production this must come from a secret manager,
+  # never be committed to source control, and be rotated periodically.
+  secret: "Zm9yLWRuNS13ZWVrMy1kZW1vLW9ubHktand0LXNpZ25pbmcta2V5LTIwMjYtc3ByaW5nLWJvb3Q="
+  expiration-ms: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

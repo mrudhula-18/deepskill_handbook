@@ -1,0 +1,72 @@
+// Jenkinsfile - declarative pipeline for Module 14 (DevOps / CI-CD)
+//
+// Generic pipeline for a Java Maven project. This file assumes the
+// pipeline runs from the root of a single Maven module. If you want to
+// point it at a specific module inside this multi-module training repo
+// (e.g. Week-3 Module-09 or a Week-7 capstone backend), wrap the Build
+// and Test stages' steps in:
+//
+//     dir('path/to/module') { sh 'mvn -B clean package' }
+//
+// replacing 'path/to/module' with the module you want to build.
+
+pipeline {
+    agent any
+
+    tools {
+        // Names must match a Maven/JDK installation configured in
+        // "Manage Jenkins > Tools" on the Jenkins controller.
+        maven 'Maven-3.9'
+        jdk 'JDK-17'
+    }
+
+    options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Adjust the working directory here if targeting a
+                // specific module, e.g.:
+                //   dir('Week-3-Data-and-REST/09-Spring-REST-SpringBoot3') {
+                //       sh 'mvn -B clean package'
+                //   }
+                sh 'mvn -B clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn -B test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Package/Archive') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed - check the Test stage results and console log.'
+        }
+    }
+}
